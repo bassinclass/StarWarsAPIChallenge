@@ -8,10 +8,10 @@
 
 import UIKit
 
-struct PeopleDescription: Decodable {
-    let count: Int
-    let results: [People]
-}
+//struct PeopleDescription: Decodable {
+//    let count: Int
+//    let results: [People]
+//}
 
 struct People: Decodable {
     let name: String
@@ -23,16 +23,8 @@ struct People: Decodable {
     let eye_color: String
 }
 
-extension String
-{
-    func removingWhitespaces() -> String {
-        return components(separatedBy: .whitespaces).joined()
-    }
-}
-
 class ViewController: UIViewController {
     
-    @IBOutlet weak var characterTextField: UITextField!
     @IBOutlet weak var characterLabel: UILabel!
 
     var name = String()
@@ -44,26 +36,23 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onFindButtonTapped(_ sender: UIButton) {
-        guard let name = characterTextField.text else { return }
-        let trimmedName = name.removingWhitespaces()
-        parse(name: trimmedName)
+        let randomNumber = Int(arc4random_uniform(88))
+        parse(number: randomNumber)
     }
     
-    func parse(name: String) {
-        let jsonUrlString = "https://swapi.co/api/people/?search=\(name)"
+    func parse(number: Int) {
+        let jsonUrlString = "https://swapi.co/api/people/\(number)/"
         guard let url = URL(string: jsonUrlString) else { return }
         URLSession.shared.dataTask(with: url) { (data, response, err) in
             guard let data = data else { return }
             do {
-                let peopleDescription = try JSONDecoder().decode(PeopleDescription.self, from: data)
-                let results = peopleDescription.results
-                let result = results[0]
-                let character = result.name
-                let height = result.height
-                let weight = result.mass
-                let gender = result.gender
-                let hairColor = result.hair_color
-                let eyeColor = result.eye_color
+                let people = try JSONDecoder().decode(People.self, from: data)
+                let character = people.name
+                let height = people.height
+                let weight = people.mass
+                let gender = people.gender
+                let hairColor = people.hair_color
+                let eyeColor = people.eye_color
                 self.displayInfo(characterName: character, characterHeight: height, characterWeight: weight, characterGender: gender, characterHair: hairColor, characterEyeColor: eyeColor)
                 print("name: \(character)\nheight: \(height)\nweight: \(weight)")
             } catch let jsonErr {
